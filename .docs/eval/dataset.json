@@ -1,0 +1,22 @@
+[
+  {"question": "Kapan Aurion Dynamics didirikan dan di kota mana?", "expected_answer": "14 Maret 2019, di Bandung", "in_document": true},
+  {"question": "Siapa pendiri Aurion Dynamics?", "expected_answer": "Wirawan Sastra", "in_document": true},
+  {"question": "Apa nama kode proyek utama Aurion Dynamics?", "expected_answer": "Proyek Camar", "in_document": true},
+  {"question": "Berapa daya jelajah maksimum drone Elang-9?", "expected_answer": "340 kilometer", "in_document": true},
+  {"question": "Berapa lama Elang-9 bisa terbang nonstop?", "expected_answer": "6 jam", "in_document": true},
+  {"question": "Siapa nama maskot resmi Aurion Dynamics?", "expected_answer": "Kiko", "in_document": true},
+  {"question": "Kenapa tanggal lahir Kiko (1 Januari 2016) lebih tua dari perusahaannya?", "expected_answer": "Itu lelucon internal, sengaja dibuat seolah Kiko diciptakan sebelum perusahaan berdiri", "in_document": true},
+  {"question": "Siapa yang memimpin Divisi Riset Aurion Dynamics?", "expected_answer": "Dr. Bunga Larasati", "in_document": true},
+  {"question": "Sebelum bergabung ke Aurion Dynamics, Dr. Bunga Larasati bekerja di mana?", "expected_answer": "Laboratorium penerbangan di Toulouse, Prancis", "in_document": true},
+  {"question": "Apa tujuan dari Proyek Camar Fase 2?", "expected_answer": "Menambahkan deteksi asap kebakaran hutan otomatis pakai sensor inframerah", "in_document": true},
+  {"question": "Apa penyebab insiden kegagalan Elang-9 pada 9 September 2023?", "expected_answer": "Kerusakan modul GPS internal", "in_document": true},
+  {"question": "Apa nama protokol keamanan yang dibuat setelah insiden Gunung Puntang?", "expected_answer": "Protokol Camar-9", "in_document": true},
+  {"question": "Berapa harga langganan paket dasar CamarView per bulan?", "expected_answer": "Rp 4.500.000", "in_document": true},
+  {"question": "Berapa pendapatan tahunan Aurion Dynamics di tahun 2024?", "expected_answer": "Rp 8,2 miliar", "in_document": true},
+  {"question": "Siapa investor utama Aurion Dynamics dan berapa modal yang ditanamkan?", "expected_answer": "Ventura Nusantara Capital, Rp 15 miliar", "in_document": true},
+  {"question": "Di kota mana Aurion Dynamics berencana membuka kantor cabang kedua?", "expected_answer": "Balikpapan", "in_document": true},
+  {"question": "Siapa CEO Aurion Dynamics saat ini?", "expected_answer": "Tidak disebutkan di dokumen — dokumen hanya menyebut pendiri (Wirawan Sastra), bukan CEO", "in_document": false},
+  {"question": "Berapa jumlah total drone Elang-9 yang sudah diproduksi Aurion Dynamics?", "expected_answer": "Tidak disebutkan di dokumen", "in_document": false},
+  {"question": "Apa ibu kota Prancis?", "expected_answer": "Tidak relevan dengan dokumen (jawaban umum: Paris, tapi ini bukan isi dokumen)", "in_document": false},
+  {"question": "Siapa nama presiden direktur Ventura Nusantara Capital?", "expected_answer": "Tidak disebutkan di dokumen", "in_document": false}
+]

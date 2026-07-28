@@ -1,0 +1,33 @@
+PROFIL PERUSAHAAN AURION DYNAMICS
+
+Aurion Dynamics adalah perusahaan rintisan teknologi yang didirikan pada tanggal 14 Maret 2019 di kota Bandung. Pendiri perusahaan ini bernama Wirawan Sastra, seorang mantan insinyur robotika. Kantor pusat Aurion Dynamics berada di Jalan Dago Asri nomor 27, Bandung. Perusahaan ini memiliki 63 karyawan per akhir tahun 2025.
+
+Nama kode proyek utama Aurion Dynamics adalah "Proyek Camar". Proyek Camar adalah sistem drone pengawas hutan yang dikembangkan sejak tahun 2021. Drone yang digunakan dalam Proyek Camar diberi nama "Elang-9". Elang-9 memiliki daya jelajah maksimum 340 kilometer dalam sekali pengisian baterai, dan mampu terbang selama 6 jam nonstop.
+
+Maskot resmi perusahaan adalah seekor karakter burung robot bernama "Kiko". Kiko pertama kali diperkenalkan pada acara ulang tahun perusahaan yang kelima, dan tanggal lahir resmi Kiko menurut cerita perusahaan adalah 1 Januari 2016, meskipun perusahaan baru berdiri tahun 2019 — ini sengaja dibuat sebagai lelucon internal karena Kiko "diciptakan sebelum perusahaan ada".
+
+DIVISI DAN TIM
+
+Aurion Dynamics memiliki tiga divisi utama: Divisi Perangkat Keras (dipimpin oleh Nadia Kusuma), Divisi Perangkat Lunak (dipimpin oleh Farrel Adiyaksa), dan Divisi Riset (dipimpin oleh Dr. Bunga Larasati). Dr. Bunga Larasati sebelumnya bekerja di sebuah laboratorium penerbangan di Toulouse, Prancis selama 8 tahun sebelum bergabung dengan Aurion Dynamics pada tahun 2020.
+
+Divisi Riset saat ini sedang mengerjakan proyek rahasia bernama "Proyek Camar Fase 2", yang bertujuan menambahkan kemampuan deteksi asap kebakaran hutan secara otomatis menggunakan sensor inframerah. Target peluncuran Proyek Camar Fase 2 adalah kuartal kedua tahun 2027.
+
+INSIDEN DAN KEAMANAN
+
+Pada tanggal 9 September 2023, terjadi insiden kegagalan sistem pada salah satu unit Elang-9 saat uji terbang di kawasan Gunung Puntang. Insiden ini disebabkan oleh kerusakan pada modul GPS internal, bukan karena kesalahan perangkat lunak. Tidak ada korban jiwa dalam insiden tersebut, namun satu unit drone hilang dan tidak pernah ditemukan kembali.
+
+Setelah insiden tersebut, perusahaan menerapkan kebijakan baru bernama "Protokol Camar-9": setiap unit Elang-9 wajib menjalani pemeriksaan modul GPS ganda sebelum uji terbang apa pun. Protokol ini mulai berlaku efektif 1 November 2023.
+
+PRODUK DAN LAYANAN
+
+Selain Proyek Camar, Aurion Dynamics juga menjual produk sampingan berupa perangkat lunak pemantauan bernama "CamarView", sebuah dashboard berbasis web yang memungkinkan klien memantau posisi drone secara real-time. CamarView diluncurkan secara komersial pada bulan Juni 2022 dan hingga kini memiliki 14 klien korporat, mayoritas dari sektor kehutanan dan perkebunan sawit.
+
+Harga langganan CamarView adalah Rp 4.500.000 per bulan untuk paket dasar, dan Rp 12.000.000 per bulan untuk paket korporat dengan akses API penuh.
+
+KEUANGAN
+
+Pada tahun 2024, Aurion Dynamics mencatat pendapatan tahunan sebesar Rp 8,2 miliar, naik dari Rp 5,1 miliar pada tahun 2023. Investor utama perusahaan adalah sebuah firma modal ventura bernama Ventura Nusantara Capital, yang menanamkan modal sebesar Rp 15 miliar pada putaran pendanaan seri A di tahun 2022.
+
+RENCANA MASA DEPAN
+
+Aurion Dynamics berencana membuka kantor cabang kedua di kota Balikpapan pada tahun 2026, untuk mendekatkan operasional dengan klien-klien di sektor perkebunan Kalimantan. Nama proyek ekspansi ini adalah "Proyek Camar Timur".
