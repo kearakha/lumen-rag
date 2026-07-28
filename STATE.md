@@ -4,7 +4,7 @@
 > Rolling: simpan 10 entri terakhir, sisanya arsip di bawah garis `--- ARSIP ---`.
 
 ## Milestone aktif
-**M3 — Evaluasi** (belum mulai)
+**M3 — Evaluasi** (in progress — terhambat kuota harian Gemini, lanjut besok)
 
 ## Success criteria (dari PRD, yang harus bisa diverifikasi sendiri)
 - [ ] Lumen menjawab dari isi dokumen upload (bukti: fakta unik).
@@ -48,6 +48,19 @@
 - **Parkir (godaan di luar scope):**
   - Streaming token asli (real per-token dari Gemini) — didiskusikan tapi sengaja tidak dikerjakan, ditunda kalau UX-nya beneran dibutuhkan nanti.
   - Redis untuk queue — didiskusikan tapi tetap pakai `database` driver biar deploy (M4) lebih simpel.
+
+### 2026-07-18 — M3: Evaluasi (belum selesai, disambung besok)
+- **Passed:**
+  - Dokumen uji fiktif "Aurion Dynamics" dibuat (`.docs/eval/test-document.txt`, ~20 fakta unik) dan berhasil di-upload+chunk+embed (5 chunk, document_id=1).
+  - Dataset 20 pertanyaan (`.docs/eval/dataset.json`) — 16 pertanyaan dari isi dokumen, 4 sengaja di luar dokumen (uji halusinasi).
+  - Command baru `php artisan eval:run --out=... --delay=N` — jalanin pipeline RAG langsung (sinkron, skip queue) per pertanyaan, tulis hasil progresif ke tabel markdown untuk digrading manual. Sempat berhasil jalan sampai 10 pertanyaan sebelum kena limit.
+- **Failed / belum:**
+  - **Kuota harian Gemini free tier abis** sebelum eval selesai. Model `gemini-flash-latest` sekarang resolve ke `gemini-3.5-flash`, dan tier gratisnya cuma **20 request chat/hari** (bukan per-menit — pesan error awal menyesatkan, quotaId sebenarnya `GenerateRequestsPerDayPerProjectPerModel-FreeTier`). Sudah kepakai duluan dari beberapa percobaan uji command.
+  - Keputusan: tunggu reset kuota besok (bukan ganti model / aktifkan billing), lanjut `php artisan eval:run --out=.docs/eval/results-baseline.md --delay=20` besok pagi. Dataset & command sudah siap, tinggal jalan.
+- **Rule worth remembering:**
+  - Model Gemini gratis (`gemini-flash-latest` → `gemini-3.5-flash` saat ini) punya limit **20 request/hari**, jauh lebih ketat dari dugaan awal. Kalau mau eval batch (>20 pertanyaan) di satu sesi, ini jadi constraint keras — pertimbangkan split hari atau upgrade billing kalau butuh volume lebih besar nanti.
+  - Pesan error 429 Gemini bisa nunjuk ke `RetryInfo` beberapa detik (kesannya rate-limit per-menit) padahal root cause-nya kuota harian — cek `quotaId` di response, jangan cuma percaya `retryDelay`.
+- **Parkir (godaan di luar scope):** —
 
 <!--
 Template entri berikutnya (copy saat mulai milestone baru):
