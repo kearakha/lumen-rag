@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\GeminiQuotaExceededException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -29,6 +30,10 @@ class Embedder
                     ], $texts),
                 ]
             );
+
+        if ($response->status() === 429 && str_contains($response->body(), 'PerDay')) {
+            throw new GeminiQuotaExceededException('Kuota harian Gemini API sudah habis. Coba lagi besok setelah kuota reset.');
+        }
 
         if ($response->failed()) {
             throw new RuntimeException('Embedding request failed: '.$response->body());
