@@ -39,6 +39,7 @@ class AskJob implements ShouldQueue
 
         $chunks = Chunk::query()
             ->with('document')
+            ->where('document_id', $ask->document_id)
             ->nearestNeighbors('embedding', $questionEmbedding, Distance::Cosine)
             ->take(3)
             ->get();
