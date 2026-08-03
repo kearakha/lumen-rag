@@ -5,8 +5,8 @@ namespace App\Services;
 class Chunker
 {
     public function __construct(
-        private int $size = 1000,
-        private int $overlap = 200,
+        private int $size = 500,
+        private int $overlap = 100,
     ) {}
 
     /**

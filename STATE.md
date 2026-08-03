@@ -4,11 +4,11 @@
 > Rolling: simpan 10 entri terakhir, sisanya arsip di bawah garis `--- ARSIP ---`.
 
 ## Milestone aktif
-**M3 — Evaluasi** (in progress — terhambat kuota harian Gemini, lanjut besok)
+**M4 — Deploy publik** (belum mulai)
 
 ## Success criteria (dari PRD, yang harus bisa diverifikasi sendiri)
-- [ ] Lumen menjawab dari isi dokumen upload (bukti: fakta unik).
-- [ ] Tabel eval sebelum-vs-sesudah dengan angka konkret.
+- [x] Lumen menjawab dari isi dokumen upload (bukti: fakta unik).
+- [x] Tabel eval sebelum-vs-sesudah dengan angka konkret.
 - [ ] Live di URL publik, dipakai orang lain tanpa penjelasan.
 
 ---
@@ -61,6 +61,19 @@
   - Model Gemini gratis (`gemini-flash-latest` → `gemini-3.5-flash` saat ini) punya limit **20 request/hari**, jauh lebih ketat dari dugaan awal. Kalau mau eval batch (>20 pertanyaan) di satu sesi, ini jadi constraint keras — pertimbangkan split hari atau upgrade billing kalau butuh volume lebih besar nanti.
   - Pesan error 429 Gemini bisa nunjuk ke `RetryInfo` beberapa detik (kesannya rate-limit per-menit) padahal root cause-nya kuota harian — cek `quotaId` di response, jangan cuma percaya `retryDelay`.
 - **Parkir (godaan di luar scope):** —
+
+### 2026-08-03 — M3: Evaluasi (ditutup)
+- **Passed:**
+  - Baseline eval (chunk size 1000/overlap 200, `.docs/eval/results-baseline.md`) selesai penuh 20/20 pertanyaan setelah kuota reset. Hasil: **19/20 PASS**, 1 FAIL (soal #10, "tujuan Proyek Camar Fase 2" — jawabannya ada di dokumen tapi chunk-nya tidak masuk top-3 retrieval). 4 soal uji halusinasi (17-20) semua lolos abstain dengan benar — **0 halusinasi**.
+  - Iterasi perbaikan: `Chunker` diubah dari size 1000/overlap 200 → **size 500/overlap 100** (`app/Services/Chunker.php`), dokumen di-upload ulang (9 chunk vs 5 sebelumnya), eval dijalankan lagi (`.docs/eval/results-after-chunksize.md`).
+  - Hasil setelah perubahan: **tetap 19/20 PASS**, tapi soal yang gagal **berpindah** — #10 sekarang benar, tapi #6 ("nama maskot") yang tadinya benar jadi gagal (jawabannya ada di dokumen, chunk-nya tidak masuk top-3 dari 9 chunk). 0 halusinasi tetap terjaga di kedua run.
+  - **Temuan utama (bukti eval sebelum-vs-sesudah):** memperkecil chunk size memang bikin tiap chunk lebih fokus satu topik (baik untuk presisi), tapi kalau `top-k` retrieval tidak ikut disesuaikan, cakupan corpus yang ke-cover top-3 justru menyempit (60% dari 5 chunk → 33% dari 9 chunk) — jadi masalah retrieval-miss bergeser ke soal lain, bukan hilang. Chunk size dan top-k itu satu paket, tidak bisa diubah sendiri-sendiri tanpa mikirin yang lain.
+- **Failed / belum:** —
+- **Rule worth remembering:**
+  - Port 3000 dan 8000 di mesin ini sudah dipakai proyek lain (TOP-FIK ews-api via Herd nginx, dan sebuah container Docker) — Lumen pakai **port 8001** buat `artisan serve` mulai sesi ini.
+  - Sebelum ubah parameter retrieval (chunk size, top-k, dsb), selalu cek isi chunk aktual dan posisi karakter fakta yang dicari (`mb_strpos` manual) — ini yang mengungkap bahwa soal #10 gagal bukan karena kontennya hilang dari chunk, tapi karena ranking similarity yang meleset. Diagnosis dulu sebelum ubah kode, bukan tebak-tebak ubah parameter.
+- **Parkir (godaan di luar scope):**
+  - Tuning `top-k` retrieval (naikkan dari 3) atau similarity threshold minimum — relevan buat nutup gap #6 vs #10, tapi di luar scope "satu perubahan" M3. Baru relevan kalau nanti mau eval lanjutan atau pas ada laporan retrieval-miss nyata di produksi.
 
 <!--
 Template entri berikutnya (copy saat mulai milestone baru):

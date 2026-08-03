@@ -1,11 +1,22 @@
 | # | Pertanyaan | Dokumen diretrieve | Jawaban Lumen | Verdict (isi manual) |
 |---|---|---|---|---|
-| 1 | Kapan Aurion Dynamics didirikan dan di kota mana? | aurion-dynamics-profile.txt | Aurion Dynamics didirikan pada tanggal 14 Maret 2019 di kota Bandung. |  |
-| 2 | Siapa pendiri Aurion Dynamics? | aurion-dynamics-profile.txt | Pendiri Aurion Dynamics adalah Wirawan Sastra. |  |
-| 3 | Apa nama kode proyek utama Aurion Dynamics? | aurion-dynamics-profile.txt | Nama kode proyek utama Aurion Dynamics adalah **"Proyek Camar"**. |  |
-| 4 | Berapa daya jelajah maksimum drone Elang-9? | aurion-dynamics-profile.txt | Berdasarkan konteks di atas, daya jelajah maksimum drone Elang-9 adalah 340 kilometer dalam sekali pengisian baterai. |  |
-| 5 | Berapa lama Elang-9 bisa terbang nonstop? | aurion-dynamics-profile.txt | Berdasarkan konteks di atas, Elang-9 mampu terbang selama 6 jam nonstop. |  |
-| 6 | Siapa nama maskot resmi Aurion Dynamics? | aurion-dynamics-profile.txt | Nama maskot resmi Aurion Dynamics adalah Kiko (seekor karakter burung robot). |  |
-| 7 | Kenapa tanggal lahir Kiko (1 Januari 2016) lebih tua dari perusahaannya? | aurion-dynamics-profile.txt | Hal tersebut sengaja dibuat sebagai lelucon internal karena Kiko "diciptakan sebelum perusahaan ada". |  |
-| 8 | Siapa yang memimpin Divisi Riset Aurion Dynamics? | aurion-dynamics-profile.txt | Divisi Riset Aurion Dynamics dipimpin oleh Dr. Bunga Larasati. |  |
-| 9 | Sebelum bergabung ke Aurion Dynamics, Dr. Bunga Larasati bekerja di mana? | aurion-dynamics-profile.txt | Sebelum bergabung ke Aurion Dynamics, Dr. Bunga Larasati bekerja di sebuah laboratorium penerbangan di Toulouse, Prancis. |  |
+| 1 | Kapan Aurion Dynamics didirikan dan di kota mana? | aurion-dynamics-profile.txt | Berdasarkan konteks di atas, Aurion Dynamics didirikan pada tanggal **14 Maret 2019** di kota **Bandung**. | PASS |
+| 2 | Siapa pendiri Aurion Dynamics? | aurion-dynamics-profile.txt | Pendiri Aurion Dynamics adalah Wirawan Sastra. | PASS |
+| 3 | Apa nama kode proyek utama Aurion Dynamics? | aurion-dynamics-profile.txt | Nama kode proyek utama Aurion Dynamics adalah "Proyek Camar". | PASS |
+| 4 | Berapa daya jelajah maksimum drone Elang-9? | aurion-dynamics-profile.txt | Daya jelajah maksimum drone Elang-9 adalah 340 kilometer dalam sekali pengisian baterai. | PASS |
+| 5 | Berapa lama Elang-9 bisa terbang nonstop? | aurion-dynamics-profile.txt | Berdasarkan konteks di atas, Elang-9 mampu terbang selama **6 jam nonstop**. | PASS |
+| 6 | Siapa nama maskot resmi Aurion Dynamics? | aurion-dynamics-profile.txt | Nama maskot resmi Aurion Dynamics adalah Kiko. | PASS |
+| 7 | Kenapa tanggal lahir Kiko (1 Januari 2016) lebih tua dari perusahaannya? | aurion-dynamics-profile.txt | Hal itu sengaja dibuat sebagai lelucon internal karena Kiko "diciptakan sebelum perusahaan ada". | PASS |
+| 8 | Siapa yang memimpin Divisi Riset Aurion Dynamics? | aurion-dynamics-profile.txt | Divisi Riset Aurion Dynamics dipimpin oleh Dr. Bunga Larasati. | PASS |
+| 9 | Sebelum bergabung ke Aurion Dynamics, Dr. Bunga Larasati bekerja di mana? | aurion-dynamics-profile.txt | Sebelum bergabung ke Aurion Dynamics, Dr. Bunga Larasati bekerja di sebuah laboratorium penerbangan di Toulouse, Prancis. | PASS |
+| 10 | Apa tujuan dari Proyek Camar Fase 2? | aurion-dynamics-profile.txt | Berdasarkan konteks yang diberikan, tidak disebutkan apa tujuan dari Proyek Camar Fase 2 (hanya disebutkan target peluncurannya adalah kuartal kedua tahun 2027). Oleh karena itu, saya tidak tahu. | FAIL — dokumen sebenarnya menyebutkan tujuannya (deteksi asap kebakaran hutan otomatis pakai sensor inframerah), tapi chunk itu tidak keambil saat retrieval. Retrieval miss, bukan halusinasi. |
+| 11 | Apa penyebab insiden kegagalan Elang-9 pada 9 September 2023? | aurion-dynamics-profile.txt | Penyebab insiden kegagalan Elang-9 pada 9 September 2023 adalah kerusakan pada modul GPS internal, bukan karena kesalahan perangkat lunak. | PASS |
+| 12 | Apa nama protokol keamanan yang dibuat setelah insiden Gunung Puntang? | aurion-dynamics-profile.txt | Nama protokol keamanan yang dibuat setelah insiden Gunung Puntang adalah **Protokol Camar-9**. | PASS |
+| 13 | Berapa harga langganan paket dasar CamarView per bulan? | aurion-dynamics-profile.txt | Harga langganan paket dasar CamarView adalah Rp 4.500.000 per bulan. | PASS |
+| 14 | Berapa pendapatan tahunan Aurion Dynamics di tahun 2024? | aurion-dynamics-profile.txt | Berdasarkan konteks di atas, pendapatan tahunan Aurion Dynamics pada tahun 2024 adalah sebesar **Rp 8,2 miliar**. | PASS |
+| 15 | Siapa investor utama Aurion Dynamics dan berapa modal yang ditanamkan? | aurion-dynamics-profile.txt | Investor utama Aurion Dynamics adalah sebuah firma modal ventura bernama **Ventura Nusantara Capital**, dengan modal yang ditanamkan sebesar **Rp 15 miliar** (pada putaran pendanaan seri A di tahun 2022). | PASS |
+| 16 | Di kota mana Aurion Dynamics berencana membuka kantor cabang kedua? | aurion-dynamics-profile.txt | Berdasarkan konteks di atas, Aurion Dynamics berencana membuka kantor cabang kedua di kota **Balikpapan**. | PASS |
+| 17 | Siapa CEO Aurion Dynamics saat ini? | aurion-dynamics-profile.txt | Berdasarkan konteks yang diberikan, tidak ada informasi mengenai siapa CEO Aurion Dynamics saat ini. Saya tidak tahu. | PASS — abstain benar, info memang tidak ada di dokumen. |
+| 18 | Berapa jumlah total drone Elang-9 yang sudah diproduksi Aurion Dynamics? | aurion-dynamics-profile.txt | Berdasarkan konteks yang diberikan, tidak ada informasi mengenai jumlah total drone Elang-9 yang sudah diproduksi oleh Aurion Dynamics. Saya tidak tahu jawabannya. | PASS — abstain benar, info memang tidak ada di dokumen. |
+| 19 | Apa ibu kota Prancis? | aurion-dynamics-profile.txt | Berdasarkan konteks yang diberikan, saya tidak tahu karena informasi mengenai ibu kota Prancis tidak disebutkan dalam teks. | PASS — abstain benar, pertanyaan di luar dokumen. |
+| 20 | Siapa nama presiden direktur Ventura Nusantara Capital? | aurion-dynamics-profile.txt | Berdasarkan konteks yang diberikan, tidak ada informasi mengenai siapa nama presiden direktur Ventura Nusantara Capital (Saya tidak tahu). | PASS — abstain benar, info memang tidak ada di dokumen. |
