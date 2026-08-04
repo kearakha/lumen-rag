@@ -11,7 +11,7 @@ use Pgvector\Laravel\Distance;
 
 class EvalRun extends Command
 {
-    protected $signature = 'eval:run {--dataset=.docs/eval/dataset.json} {--out=} {--delay=13}';
+    protected $signature = 'eval:run {--dataset=.docs/eval/dataset.json} {--out=} {--delay=13} {--document-id=2}';
 
     protected $description = 'Jalankan set pertanyaan eval lewat pipeline RAG dan simpan hasilnya ke markdown untuk digrading manual';
 
@@ -22,6 +22,7 @@ class EvalRun extends Command
 
         $outPath = $this->option('out') ?: base_path('.docs/eval/results-'.now()->format('Ymd-His').'.md');
         $delay = (int) $this->option('delay');
+        $documentId = (int) $this->option('document-id');
 
         file_put_contents($outPath, "| # | Pertanyaan | Dokumen diretrieve | Jawaban Lumen | Verdict (isi manual) |\n|---|---|---|---|---|\n");
 
@@ -38,6 +39,7 @@ class EvalRun extends Command
 
             $chunks = Chunk::query()
                 ->with('document')
+                ->where('document_id', $documentId)
                 ->nearestNeighbors('embedding', $questionEmbedding, Distance::Cosine)
                 ->take(3)
                 ->get();

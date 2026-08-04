@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\GeminiQuotaExceededException;
 use App\Models\Ask;
 use App\Models\Chunk;
 use App\Services\Embedder;
@@ -35,16 +36,23 @@ class AskJob implements ShouldQueue
         $ask = Ask::findOrFail($this->askId);
         $ask->update(['status' => 'processing']);
 
-        $questionEmbedding = $embedder->embed($ask->question);
+        try {
+            $questionEmbedding = $embedder->embed($ask->question);
 
-        $chunks = Chunk::query()
-            ->with('document')
-            ->nearestNeighbors('embedding', $questionEmbedding, Distance::Cosine)
-            ->take(3)
-            ->get();
+            $chunks = Chunk::query()
+                ->with('document')
+                ->where('document_id', $ask->document_id)
+                ->nearestNeighbors('embedding', $questionEmbedding, Distance::Cosine)
+                ->take(3)
+                ->get();
 
-        $prompt = $promptBuilder->build($ask->question, $chunks);
-        $answer = $llm->ask($prompt);
+            $prompt = $promptBuilder->build($ask->question, $chunks);
+            $answer = $llm->ask($prompt);
+        } catch (GeminiQuotaExceededException $e) {
+            $this->fail($e);
+
+            return;
+        }
 
         $ask->update([
             'status' => 'done',
@@ -58,9 +66,13 @@ class AskJob implements ShouldQueue
 
     public function failed(Throwable $exception): void
     {
+        $message = $exception instanceof GeminiQuotaExceededException
+            ? $exception->getMessage()
+            : 'Gagal mendapat jawaban dari LLM setelah beberapa percobaan. Coba lagi nanti.';
+
         Ask::whereKey($this->askId)->update([
             'status' => 'failed',
-            'error' => 'Gagal mendapat jawaban dari LLM setelah beberapa percobaan. Coba lagi nanti.',
+            'error' => $message,
         ]);
     }
 }

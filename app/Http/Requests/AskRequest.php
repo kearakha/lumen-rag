@@ -24,6 +24,7 @@ class AskRequest extends FormRequest
     {
         return [
             'question' => ['required', 'string', 'max:2000'],
+            'document_id' => ['required', 'integer', 'exists:documents,id'],
         ];
     }
 }

@@ -13,6 +13,7 @@ class AskController extends Controller
     public function store(AskRequest $request): JsonResponse
     {
         $ask = Ask::create([
+            'document_id' => $request->validated('document_id'),
             'question' => $request->validated('question'),
             'status' => 'pending',
         ]);
