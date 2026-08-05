@@ -4,12 +4,12 @@
 > Rolling: simpan 10 entri terakhir, sisanya arsip di bawah garis `--- ARSIP ---`.
 
 ## Milestone aktif
-**M4 — Deploy publik** (in progress — fase 1-3 selesai, fase deploy belum)
+**M5 — Konten & lamaran** (belum mulai)
 
 ## Success criteria (dari PRD, yang harus bisa diverifikasi sendiri)
 - [x] Lumen menjawab dari isi dokumen upload (bukti: fakta unik).
 - [x] Tabel eval sebelum-vs-sesudah dengan angka konkret.
-- [ ] Live di URL publik, dipakai orang lain tanpa penjelasan.
+- [x] Live di URL publik (`http://152.42.239.1`) — endpoint API terverifikasi jalan; UI belum ada, lihat catatan M4 soal ini.
 
 ---
 
@@ -62,18 +62,28 @@
   - Pesan error 429 Gemini bisa nunjuk ke `RetryInfo` beberapa detik (kesannya rate-limit per-menit) padahal root cause-nya kuota harian — cek `quotaId` di response, jangan cuma percaya `retryDelay`.
 - **Parkir (godaan di luar scope):** —
 
-### 2026-08-04 — M4: Deploy publik (fase 1-3, in progress)
+### 2026-08-05 — M4: Deploy publik (ditutup)
 - **Passed:**
+  - Provisioning DigitalOcean Droplet (Ubuntu 24.04, Singapore, `152.42.239.1`) via GitHub Student Developer Pack, akses SSH key sudah jalan.
+  - Stack server terinstall: PHP 8.3.33 + ekstensi, Composer 2.10.2, PostgreSQL 17.10 (PGDG) + pgvector, Nginx 1.24.0, Node.js v24, Supervisor 4.2.5.
+  - App ter-deploy ke `/var/www/lumen` (`composer install --no-dev`), `.env` produksi terisi (DB baru dengan password random, `GEMINI_API_KEY`, `APP_URL=http://152.42.239.1`), `migrate --seed` sukses — dokumen contoh "Aurion Dynamics" (`document_id=1`) siap ditanya.
+  - Nginx server block (proxy ke PHP-FPM socket) + Supervisor (`lumen-worker`, auto-restart `queue:work --tries=3`) jalan dan running.
+  - **Smoke test end-to-end** di server produksi (bukan simulasi lokal): `POST /api/documents` & `POST /api/ask` validasi jalan (422 rapi untuk input kosong — bukan 500), satu `ask` penuh diverifikasi lewat SSE stream sampai `event: done` — jawaban + sumber chunk keluar benar dari Gemini beneran.
+  - README ditulis ulang total (isi default scaffold Laravel dibuang): demo publik, cara pakai via `curl`, arsitektur, keputusan teknis + alasan, tabel eval sebelum-sesudah (dari M3), keterbatasan jujur.
+  - Bug ditemukan & diperbaiki saat deploy: `DatabaseSeeder` masih punya `User::factory()->create()` bawaan scaffold Laravel — gagal di server karena `fakerphp/faker` cuma ada di `require-dev`, hilang saat `composer install --no-dev`. Baris dihapus (tidak dipakai fitur Lumen manapun), bukan ditambal dengan pindah dependency ke produksi.
   - Fase 1 — scoping retrieval per dokumen: `Ask` sekarang wajib `document_id`, `AskJob` & `eval:run` filter `Chunk` per dokumen sebelum `nearestNeighbors`. Sebelumnya retrieval selalu lintas semua dokumen di DB — aman selama cuma 1 dokumen uji, tapi bakal salah begitu ada lebih dari satu dokumen (kondisi nyata setelah deploy + seed).
   - Fase 2 — config produksi: `.env.example` diselaraskan ke default produksi (pgsql, debug off). Batas upload diturunkan 10MB→2MB (upload masih sinkron dalam satu request HTTP, file besar berisiko timeout). Ditambah `GeminiQuotaExceededException` — error kuota harian (429 `quotaId` *PerDay*) sekarang langsung gagal dengan pesan jujur, bukan retry 3x backoff yang percuma (kuota baru reset besok, bukan dalam hitungan detik).
   - Fase 3 — seed dokumen contoh: `DocumentSeeder` jalanin dokumen fiktif Aurion Dynamics (dokumen eval M3) lewat pipeline Chunker+Embedder yang sama dengan upload biasa. Tujuannya: deploy publik langsung punya dokumen contoh siap tanya, orang lain tidak perlu upload manual dulu buat coba Lumen.
 - **Failed / belum:**
-  - Fase deploy publik itu sendiri (hosting, domain/URL, worker queue di server) belum dikerjakan — ini instruksi eksplisit di PRD/PLAN yang jadi definisi "selesai" M4.
-  - README (apa ini, cara pakai, keputusan teknis, hasil eval, keterbatasan jujur) belum ditulis.
+  - **Belum ada domain** — akses masih pakai IP polos (`http://152.42.239.1`), belum HTTPS. Perlu domain (GitHub Student Pack ada jatah gratis Namecheap `.me` — cek sudah diklaim atau belum) baru lanjut HTTPS (Certbot/Let's Encrypt butuh domain, gak bisa untuk IP polos).
+  - **Halaman `/` masih default Laravel welcome page** — `routes/web.php` belum diubah, `GET /` masih render `view('welcome')` bawaan scaffold. Ketauan pas Rakha buka `http://152.42.239.1` di browser: yang muncul halaman "Let's get started" Laravel, bukan sesuatu yang menjelaskan Lumen. Ini bentrok langsung sama success criteria M4 di PRD ("kirim link ke teman, mereka pakai tanpa dijelaskan") — API-only + landing page kosong berarti orang awam yang buka link gak akan tahu ini apa atau cara pakainya. Perlu diputuskan: UI minimal (form tanya + upload) atau landing page statis yang jelasin cara pakai `curl`. Belum dikerjakan, nunggu keputusan Rakha.
 - **Rule worth remembering:**
   - Retrieval per-dokumen (scoping) itu prasyarat keras sebelum seed dokumen contoh — kalau dibalik urutannya (seed dulu, scoping belakangan), window di mana ada >1 dokumen tanpa scoping bakal kasih jawaban silang-dokumen yang salah tanpa disadari.
   - Kuota Gemini yang habis per hari (bukan per menit — lihat catatan M3) sekarang punya exception dedicated (`GeminiQuotaExceededException`) supaya `AskJob` tidak buang 3x retry+backoff percuma untuk error yang pasti gagal lagi sampai besok.
-- **Parkir (godaan di luar scope):** —
+  - **"Live di URL publik" dan "dipakai tanpa penjelasan" itu dua kriteria beda** — API yang jalan sempurna lewat `curl` tidak otomatis memenuhi kriteria kedua. Baru ketauan pas benar-benar dibuka lewat browser (bukan cuma dites lewat `curl` seperti sepanjang sesi ini), bukan pas smoke test API. Pelajaran: verifikasi "dipakai orang lain" harus lewat cara orang lain benar-benar akan mengakses (browser), bukan cuma lewat cara developer tes (`curl`/API client).
+- **Parkir (godaan di luar scope):**
+  - HTTPS/SSL — nunggu domain ada dulu, IP polos gak bisa Let's Encrypt.
+  - UI web (form upload+tanya) — sempat direncanakan masuk M4 Fase 3 versi awal (Vite+Tailwind), tapi diputuskan skip demi kecepatan; sekarang jadi relevan lagi karena gap di atas. Keputusan final ditunda ke sesi berikutnya.
 
 ### 2026-08-03 — M3: Evaluasi (ditutup)
 - **Passed:**
