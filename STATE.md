@@ -4,7 +4,7 @@
 > Rolling: simpan 10 entri terakhir, sisanya arsip di bawah garis `--- ARSIP ---`.
 
 ## Milestone aktif
-**M4 — Deploy publik** (belum mulai)
+**M4 — Deploy publik** (in progress — fase 1-3 selesai, fase deploy belum)
 
 ## Success criteria (dari PRD, yang harus bisa diverifikasi sendiri)
 - [x] Lumen menjawab dari isi dokumen upload (bukti: fakta unik).
@@ -60,6 +60,19 @@
 - **Rule worth remembering:**
   - Model Gemini gratis (`gemini-flash-latest` → `gemini-3.5-flash` saat ini) punya limit **20 request/hari**, jauh lebih ketat dari dugaan awal. Kalau mau eval batch (>20 pertanyaan) di satu sesi, ini jadi constraint keras — pertimbangkan split hari atau upgrade billing kalau butuh volume lebih besar nanti.
   - Pesan error 429 Gemini bisa nunjuk ke `RetryInfo` beberapa detik (kesannya rate-limit per-menit) padahal root cause-nya kuota harian — cek `quotaId` di response, jangan cuma percaya `retryDelay`.
+- **Parkir (godaan di luar scope):** —
+
+### 2026-08-04 — M4: Deploy publik (fase 1-3, in progress)
+- **Passed:**
+  - Fase 1 — scoping retrieval per dokumen: `Ask` sekarang wajib `document_id`, `AskJob` & `eval:run` filter `Chunk` per dokumen sebelum `nearestNeighbors`. Sebelumnya retrieval selalu lintas semua dokumen di DB — aman selama cuma 1 dokumen uji, tapi bakal salah begitu ada lebih dari satu dokumen (kondisi nyata setelah deploy + seed).
+  - Fase 2 — config produksi: `.env.example` diselaraskan ke default produksi (pgsql, debug off). Batas upload diturunkan 10MB→2MB (upload masih sinkron dalam satu request HTTP, file besar berisiko timeout). Ditambah `GeminiQuotaExceededException` — error kuota harian (429 `quotaId` *PerDay*) sekarang langsung gagal dengan pesan jujur, bukan retry 3x backoff yang percuma (kuota baru reset besok, bukan dalam hitungan detik).
+  - Fase 3 — seed dokumen contoh: `DocumentSeeder` jalanin dokumen fiktif Aurion Dynamics (dokumen eval M3) lewat pipeline Chunker+Embedder yang sama dengan upload biasa. Tujuannya: deploy publik langsung punya dokumen contoh siap tanya, orang lain tidak perlu upload manual dulu buat coba Lumen.
+- **Failed / belum:**
+  - Fase deploy publik itu sendiri (hosting, domain/URL, worker queue di server) belum dikerjakan — ini instruksi eksplisit di PRD/PLAN yang jadi definisi "selesai" M4.
+  - README (apa ini, cara pakai, keputusan teknis, hasil eval, keterbatasan jujur) belum ditulis.
+- **Rule worth remembering:**
+  - Retrieval per-dokumen (scoping) itu prasyarat keras sebelum seed dokumen contoh — kalau dibalik urutannya (seed dulu, scoping belakangan), window di mana ada >1 dokumen tanpa scoping bakal kasih jawaban silang-dokumen yang salah tanpa disadari.
+  - Kuota Gemini yang habis per hari (bukan per menit — lihat catatan M3) sekarang punya exception dedicated (`GeminiQuotaExceededException`) supaya `AskJob` tidak buang 3x retry+backoff percuma untuk error yang pasti gagal lagi sampai besok.
 - **Parkir (godaan di luar scope):** —
 
 ### 2026-08-03 — M3: Evaluasi (ditutup)
