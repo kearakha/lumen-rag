@@ -1,58 +1,84 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Lumen
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+RAG document-QA — upload dokumen, tanya isinya, dapat jawaban yang mengutip sumbernya. Dibangun full di **Laravel + PostgreSQL/pgvector**, tanpa framework RAG (LangChain dkk) — chunking, embedding, retrieval, dan prompt semuanya ditulis manual supaya tiap langkah bisa dijelaskan.
 
-## About Laravel
+**Demo publik:** http://152.42.239.1 — sudah ada dokumen contoh ("Aurion Dynamics", perusahaan fiktif) yang bisa langsung ditanya tanpa upload dulu.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Proyek ini flagship portfolio, bukan produk komersial. Tujuannya membuktikan satu rantai skill utuh: panggil LLM dari backend, RAG, queue+retry, eval terukur, sampai deploy publik — bukan cuma prototipe di notebook.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Cara pakai
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Upload dokumen:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+curl -X POST http://152.42.239.1/api/documents \
+  -F "file=@dokumen-kamu.pdf"
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Tanya (async — balikin `ask_id` langsung, jawaban diproses di background):
 
-## Contributing
+```bash
+curl -X POST http://152.42.239.1/api/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "isi pertanyaan", "document_id": 1}'
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Ambil jawaban lewat SSE stream (`event: done` berisi jawaban + kutipan chunk sumber):
 
-## Code of Conduct
+```bash
+curl -N http://152.42.239.1/api/ask/{ask_id}/stream
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Dokumen contoh yang sudah ter-seed punya `document_id=1`.
 
-## Security Vulnerabilities
+## Arsitektur
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+Upload dokumen → ekstrak teks → chunk (500 char, overlap 100)
+              → embed (Gemini gemini-embedding-001, 768 dim) → simpan pgvector
 
-## License
+Pertanyaan → embed pertanyaan → cari 3 chunk termirip (cosine distance,
+           discope ke document_id yang diminta) → susun prompt →
+           panggil LLM lewat queue job → hasil dipoll via SSE
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Semua panggilan ke Gemini (embedding maupun chat) lewat job antrian (`database` queue driver), retry otomatis 3x dengan backoff 5s/15s/30s kalau gagal — kecuali error kuota harian, yang langsung gagal dengan pesan jujur (backoff tidak akan menolong kuota yang baru reset besok).
+
+## Keputusan teknis & alasannya
+
+- **Provider LLM: Gemini, bukan OpenAI/Anthropic.** OpenAI menolak API key tanpa billing aktif (`insufficient_quota`); Gemini punya free tier yang cukup untuk proyek portfolio.
+- **pgvector, bukan vector DB terpisah (Pinecone/Qdrant).** Satu database untuk data relasional dan vector — lebih sedikit moving part untuk skala proyek ini, dan `pgvector/pgvector-php` menyediakan migration helper + query nearest-neighbor lewat Eloquent langsung.
+- **SSE = polling status, bukan streaming token asli dari LLM.** Job jalan async di background (biar bisa di-retry dan tidak mem-block request); SSE "menonton" status record di DB tiap 0.5 detik, bukan mem-forward token per-token dari Gemini. Trade-off yang disadari: UX-nya bukan token-by-token, tapi arsitekturnya tetap kompatibel dengan retry dan tidak butuh infrastruktur tambahan (Redis pub/sub, dll).
+- **Chunk size 500 / overlap 100** (bukan 1000/200) — hasil dari eval M3, lihat bagian di bawah.
+- **Retrieval discope per `document_id`.** Tanpa ini, pertanyaan tentang satu dokumen bisa terjawab pakai potongan dokumen lain begitu database punya lebih dari satu dokumen — jadi wajib sebelum dipakai publik oleh banyak orang.
+- **Batas upload 2MB.** Upload diproses sinkron dalam satu request HTTP (ekstrak → chunk → embed sekaligus) — file besar berisiko timeout.
+- **Deploy: DigitalOcean Droplet manual** (Nginx + PHP-FPM + Postgres + Supervisor), bukan platform-as-a-service — dipilih karena kontrol penuh atas pgvector dan proses queue worker, dengan konsekuensi setup infra dikerjakan manual.
+
+## Hasil evaluasi
+
+20 pertanyaan (16 dari isi dokumen uji, 4 sengaja di luar dokumen untuk uji halusinasi), dinilai manual benar/salah/halusinasi.
+
+| | Chunk 1000/overlap 200 (baseline) | Chunk 500/overlap 100 (setelah) |
+|---|---|---|
+| Benar | 19/20 | 19/20 |
+| Halusinasi | 0/20 | 0/20 |
+| Gagal-retrieve | #10 (tujuan Proyek Camar Fase 2) | #6 (nama maskot) |
+
+Memperkecil chunk size membuat tiap chunk lebih fokus satu topik (baik untuk soal #10), tapi karena `top-k` retrieval (3) tidak ikut disesuaikan, cakupan corpus yang ter-cover top-3 menyempit — dari 60% (5 chunk) jadi 33% (9 chunk). Hasilnya: masalah retrieval-miss **berpindah** ke soal lain, bukan hilang. Chunk size dan top-k adalah satu paket parameter, tidak bisa diubah sendiri-sendiri tanpa dampak ke yang lain.
+
+Detail lengkap tiap soal: `.docs/eval/results-baseline.md` dan `.docs/eval/results-after-chunksize.md`.
+
+## Keterbatasan jujur
+
+- **Retrieval bisa meleset** kalau top-3 chunk termirip secara embedding ternyata bukan chunk yang benar-benar menjawab pertanyaan (lihat hasil eval di atas). Sistem tidak berhalusinasi dalam kasus ini — dia jawab "tidak tahu" — tapi jawabannya salah karena informasinya "ketinggalan" di luar top-3.
+- **Tidak ada streaming token asli** — jawaban baru muncul utuh setelah LLM selesai memproses, SSE cuma menunjukkan status pending/processing di antaranya.
+- **Kuota Gemini free tier: 20 request/hari** per model — bisa kehabisan kalau dipakai testing berat dalam satu hari.
+- **Upload maksimum 2MB**, diproses sinkron — dokumen besar bisa gagal karena timeout.
+- **Tidak ada autentikasi** — endpoint publik terbuka, cocok untuk demo, bukan multi-tenant produksi sungguhan.
+- **Belum ada UI web** — semua interaksi lewat API (`curl`/Postman).
+
+## Stack
+
+Laravel 13 · PHP 8.3 · PostgreSQL 17 + pgvector · Gemini API (`gemini-embedding-001`, `gemini-flash-latest`) · queue `database` driver · SSE · Nginx + PHP-FPM + Supervisor (DigitalOcean Droplet).
+
+Detail lebih lanjut di `.docs/STACK.md`, `.docs/DESIGN.md`, `.docs/COMPONENTS.md`. Progres tiap milestone dicatat di `STATE.md`.
