@@ -64,7 +64,7 @@
             animation: blink 1s step-end infinite;
         }
 
-        .ask-row { display: flex; }
+        .ask-row { display: flex; margin-top: 1rem; }
 
         section.section { max-width: 1120px; width: 100%; margin: 0 auto; padding: 1rem 1.5rem 3.5rem; }
 
@@ -221,12 +221,31 @@
                 return;
             }
 
+            const TYPE_MS = 45;
+            const DELETE_MS = 30;
+            const HOLD_FULL_MS = 1800;
+            const HOLD_EMPTY_MS = 500;
+
             let i = 0;
-            (function type() {
-                el.textContent = text.slice(0, i);
+            (function typeLoop() {
                 i++;
-                if (i <= text.length) setTimeout(type, 45);
+                el.textContent = text.slice(0, i);
+                if (i < text.length) {
+                    setTimeout(typeLoop, TYPE_MS);
+                } else {
+                    setTimeout(deleteLoop, HOLD_FULL_MS);
+                }
             })();
+
+            function deleteLoop() {
+                i--;
+                el.textContent = text.slice(0, i);
+                if (i > 0) {
+                    setTimeout(deleteLoop, DELETE_MS);
+                } else {
+                    setTimeout(typeLoop, HOLD_EMPTY_MS);
+                }
+            }
         })();
     </script>
 </body>
