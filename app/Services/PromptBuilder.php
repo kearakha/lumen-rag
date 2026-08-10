@@ -22,6 +22,7 @@ class PromptBuilder
 
         return <<<PROMPT
         Jawab pertanyaan HANYA berdasarkan konteks di bawah ini. Kalau konteks tidak mengandung jawabannya, katakan kamu tidak tahu — jangan mengarang.
+        Setiap klaim yang kamu tulis harus diakhiri penanda sumber sesuai nomor konteks yang kamu pakai, misalnya [1] atau [2].
 
         Konteks:
         {$context}
