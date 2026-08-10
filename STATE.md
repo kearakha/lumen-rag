@@ -9,11 +9,24 @@
 ## Success criteria (dari PRD, yang harus bisa diverifikasi sendiri)
 - [x] Lumen menjawab dari isi dokumen upload (bukti: fakta unik).
 - [x] Tabel eval sebelum-vs-sesudah dengan angka konkret.
-- [x] Live di URL publik (`http://152.42.239.1`) — endpoint API terverifikasi jalan; UI belum ada, lihat catatan M4 soal ini.
+- [x] Live di URL publik (`http://152.42.239.1`) — endpoint API jalan, dan sejak redesign UI (Agustus 2026) landing page + halaman `/app` juga live, bukan lagi welcome page default Laravel.
 
 ---
 
 ## Log
+
+### 2026-08-10 — UI: redesign landing + halaman ask (branch `redesign-glass-ui`, ditutup)
+- **Passed:**
+  - Gap yang dicatat di penutupan M4 ("halaman `/` masih default Laravel welcome page") ditutup: `/` sekarang marketing page (hero, pipeline, keputusan teknis, hasil eval, keterbatasan), `/app` route terpisah untuk fitur upload+ask yang sebenarnya.
+  - Tema diganti dari "ruangan gelap + kartu kertas" (kesan generic/AI-template) ke glassmorphism kuning-putih (metafora lampu, sesuai nama "Lumen") — dipicu temuan `design-critique` yang juga menemukan 2 bug lain (kutipan sumber kepotong tengah kata, upload toggle tidak keliatan interaktif), keduanya ikut diperbaiki.
+  - Halaman `/app` dirombak jadi layout dua kolom (percakapan kiri, rail dokumen & sumber sticky kanan), jawaban LLM di-render sebagai markdown (bold, bullet), dan sitasi `[n]` di jawaban bisa di-hover/klik untuk menyalakan kartu sumber terkait.
+  - Prompt (`PromptBuilder`) diubah agar LLM diminta eksplisit menyertakan penanda `[n]` saat mengutip konteks bernomor — sebelumnya konteks sudah bernomor tapi model tidak pernah diminta memakainya, jadi UI sitasi di atas tidak ada yang bisa ditautkan.
+  - Sudah merge ke `main` lewat PR #5.
+- **Failed / belum:** —
+- **Rule worth remembering:**
+  - "API jalan" dan "UI menunjukkan itu jalan" adalah dua hal terpisah yang gampang diverifikasi salah satunya doang — pelajaran ini sudah dicatat di M4 tapi baru benar-benar ditutup sekarang.
+  - Fitur sitasi butuh dua sisi yang saling gandeng: prompt yang minta model menandai sumber, DAN UI yang tahu cara menautkan penanda itu. Nambah salah satu tanpa yang lain (mis. UI sitasi tanpa prompt yang minta `[n]`) percuma.
+- **Parkir (godaan di luar scope):** —
 
 ### 2026-07-18 — M0: Setup & LLM pertama
 - **Passed:** Laravel 13.20 scaffold jalan. Endpoint `POST /api/ask` menerima `question`, panggil LLM, balas jawaban. Diverifikasi: `curl` ke `/api/ask` dengan pertanyaan "ibu kota Indonesia?" → jawab "Jakarta".
