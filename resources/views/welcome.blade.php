@@ -1,545 +1,232 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lumen — Tanya Jawab Dokumen</title>
-    <meta name="description" content="Upload dokumen, tanya isinya. Lumen menunjukkan bagian dokumen yang jadi sumber jawaban.">
+    <title>Lumen — Ask your documents</title>
+    <meta name="description" content="Upload a document, ask it questions. Lumen shows you the exact passage that answers you — not just an answer.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    @include('partials.styles')
     <style>
-        :root {
-            --bg: #fafaf7;
-            --ink: #211d18;
-            --ink-muted: #6b6459;
-            --rule: #c9c0ac;
-            --lumen: #f4b942;
-            --lumen-deep: #c98a1f;
-            --danger: #a6432e;
-            --font-display: 'Fraunces', serif;
-            --font-body: 'IBM Plex Sans', sans-serif;
-            --font-mono: 'IBM Plex Mono', monospace;
+        .hero {
+            max-width: 1120px; width: 100%; margin: 0 auto;
+            padding: 3.5rem 1.5rem 3rem;
+            display: flex; flex-direction: column; gap: 1.4rem;
         }
 
-        * { box-sizing: border-box; }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
+        .hero__eyebrow {
+            font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--lumen-deep);
+            animation: fadeInUp .6s ease both;
         }
 
-        body {
-            background:
-                radial-gradient(circle at 15% 0%, rgba(244, 185, 66, .22), transparent 55%),
-                radial-gradient(circle at 85% 100%, rgba(244, 185, 66, .14), transparent 50%),
-                var(--bg);
-            color: var(--ink-muted);
-            font-family: var(--font-body);
-            display: flex;
-            flex-direction: column;
+        .hero__title {
+            font-family: var(--font-display); font-style: italic; font-weight: 500;
+            font-size: clamp(2.3rem, 5.2vw, 3.6rem); line-height: 1.08;
+            color: var(--ink); margin: 0; max-width: 820px;
+            animation: fadeInUp .6s ease both; animation-delay: .08s;
         }
 
-        .sr-only {
-            position: absolute;
-            width: 1px; height: 1px;
-            overflow: hidden;
-            clip: rect(0 0 0 0);
+        .hero__body {
+            font-size: 1.08rem; line-height: 1.65; max-width: 620px; margin: 0;
+            animation: fadeInUp .6s ease both; animation-delay: .16s;
         }
 
-        a { color: var(--lumen-deep); }
-        a:hover { color: var(--ink); }
-
-        :focus-visible {
-            outline: 3px solid rgba(244, 185, 66, .65);
-            outline-offset: 2px;
+        .hero__meta {
+            display: flex; gap: 0.9rem; flex-wrap: wrap; align-items: center; margin-top: 0.4rem;
+            animation: fadeInUp .6s ease both; animation-delay: .24s;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 1rem;
-            flex-wrap: wrap;
-            padding: 2rem 1.5rem 1rem;
-        }
-
-        .wordmark {
-            font-family: var(--font-display);
-            font-style: italic;
-            font-weight: 500;
-            font-size: 1.75rem;
-            color: var(--ink);
-            letter-spacing: 0.01em;
-        }
-
-        .tagline {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--ink-muted);
-        }
+        .live-dot-row { display: flex; align-items: center; gap: 0.45rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-muted); }
+        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); display: inline-block; animation: pulseDot 2s ease-in-out infinite; }
 
         .stage {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 1.5rem;
+            max-width: 640px; width: 100%; margin: 0 auto;
+            padding: 0 1.5rem 3.5rem;
         }
 
-        .card-wrap {
-            position: relative;
-            width: 100%;
-            max-width: 640px;
+        .stage .card { animation-delay: .3s; }
+
+        .ask-placeholder-label { margin: 0 0 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-muted); }
+
+        .ask-placeholder {
+            font-family: var(--font-body); font-size: 1rem; padding: 0.85rem;
+            border: 1px solid rgba(33, 29, 24, .15); border-radius: 3px;
+            background: #fff; color: var(--ink-muted); min-height: 4.5rem;
+            cursor: default;
         }
 
-        .card-wrap::before {
-            content: "";
-            position: absolute;
-            inset: -25% -15%;
-            background: radial-gradient(closest-side, rgba(244, 185, 66, .35), transparent 70%);
-            filter: blur(16px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .card {
-            position: relative;
-            z-index: 1;
-            background: rgba(255, 255, 255, .55);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, .8);
-            color: var(--ink);
-            border-radius: 12px;
-            padding: 2.25rem;
-            box-shadow: 0 30px 60px -25px rgba(33, 29, 24, .25);
-        }
-
-        .intro {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            line-height: 1.45;
-            margin: 0 0 1.5rem;
-            color: var(--ink);
-        }
-
-        .active-doc {
-            display: flex;
-            align-items: baseline;
-            gap: 0.5rem;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--rule);
-            margin-bottom: 1rem;
-        }
-
-        .active-doc__label {
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--ink-muted);
-        }
-
-        .active-doc__name {
-            font-family: var(--font-body);
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .active-doc__name em {
-            font-style: normal;
-            font-weight: 400;
-            color: var(--ink-muted);
-        }
-
-        details.upload-toggle {
-            margin-bottom: 1.25rem;
-        }
-
-        details.upload-toggle summary {
+        .type-cursor {
             display: inline-block;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            letter-spacing: 0.04em;
-            color: var(--lumen-deep);
-            list-style: none;
-            padding: 0.4rem 0.75rem;
-            border: 1px solid var(--lumen-deep);
-            border-radius: 3px;
-            background: rgba(244, 185, 66, .12);
+            margin-left: 1px;
+            animation: blink 1s step-end infinite;
         }
 
-        details.upload-toggle summary:hover {
-            background: rgba(244, 185, 66, .22);
+        .ask-row { display: flex; }
+
+        section.section { max-width: 1120px; width: 100%; margin: 0 auto; padding: 1rem 1.5rem 3.5rem; }
+
+        .section__eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--lumen-deep); margin: 0 0 1.5rem; }
+        .section__title { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.7rem; color: var(--ink); margin: 0 0 0.4rem; }
+        .section__lead { max-width: 620px; margin: 0 0 1.5rem; line-height: 1.6; }
+
+        .pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem 1.1rem; }
+        .pipeline__step { border-top: 2px solid var(--lumen-deep); padding-top: 0.7rem; transition: transform .2s ease; cursor: default; }
+        .pipeline__step:hover { transform: translateY(-3px); }
+        .pipeline__index { font-family: var(--font-mono); font-size: 0.68rem; color: var(--lumen-deep); margin-bottom: 0.35rem; }
+        .pipeline__label { font-family: var(--font-display); font-weight: 500; font-size: 1.05rem; color: var(--ink); margin-bottom: 0.25rem; }
+        .pipeline__detail { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-muted); line-height: 1.4; }
+
+        .decisions { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.1rem; }
+        .decision {
+            background: rgba(255, 255, 255, .55); border: 1px solid rgba(255, 255, 255, .8);
+            border-radius: 10px; padding: 1.25rem 1.4rem;
+            transition: transform .2s ease, box-shadow .2s ease;
         }
+        .decision:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -20px rgba(33, 29, 24, .35); }
+        .decision__title { font-family: var(--font-body); font-weight: 600; font-size: 0.95rem; color: var(--ink); margin-bottom: 0.5rem; }
+        .decision__body { font-size: 0.88rem; line-height: 1.55; }
 
-        details.upload-toggle summary::-webkit-details-marker { display: none; }
-        details.upload-toggle summary::before { content: "+ "; }
-        details.upload-toggle[open] summary::before { content: "\2212 "; }
-
-        .upload-form {
-            margin-top: 0.75rem;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.6rem;
+        .eval-table {
+            display: grid; grid-template-columns: 1.4fr 1fr 1fr; max-width: 640px;
+            border: 1px solid var(--rule); border-radius: 10px; overflow: hidden;
+            font-family: var(--font-mono); font-size: 0.82rem;
         }
+        .eval-table__head { padding: 0.75rem 1rem; background: rgba(33, 29, 24, .06); font-weight: 500; color: var(--ink); }
+        .eval-table__cell { padding: 0.75rem 1rem; border-top: 1px solid var(--rule); color: var(--ink-muted); }
+        .eval-table__cell--val { color: var(--ink); }
+        .eval-note { max-width: 640px; margin: 1.1rem 0 0; line-height: 1.6; font-size: 0.92rem; }
 
-        .upload-form input[type="file"] {
-            font-family: var(--font-body);
-            font-size: 0.85rem;
-            color: var(--ink);
-            max-width: 100%;
+        .limitations { display: flex; flex-direction: column; gap: 0.7rem; max-width: 720px; }
+        .limitation {
+            display: flex; gap: 0.8rem; align-items: baseline; padding: 0.7rem 0;
+            border-bottom: 1px solid rgba(201, 192, 172, .6);
+            transition: padding-left .2s ease;
         }
-
-        .hint {
-            width: 100%;
-            margin: 0.3rem 0 0;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--ink-muted);
-        }
-
-        .upload-status {
-            width: 100%;
-            margin: 0.4rem 0 0;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            min-height: 1em;
-        }
-
-        .ask-form {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        textarea {
-            font-family: var(--font-body);
-            font-size: 1rem;
-            padding: 0.85rem;
-            border: 1px solid var(--rule);
-            border-radius: 3px;
-            background: #fff;
-            color: var(--ink);
-            resize: vertical;
-            min-height: 4.5rem;
-        }
-
-        .btn {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            letter-spacing: 0.03em;
-            border: none;
-            border-radius: 3px;
-            padding: 0.7rem 1.1rem;
-            cursor: pointer;
-            align-self: flex-end;
-        }
-
-        .btn--primary {
-            background: var(--lumen);
-            color: var(--ink);
-        }
-
-        .btn--primary:hover { background: var(--lumen-deep); }
-        .btn--primary:disabled { opacity: 0.5; cursor: wait; }
-
-        .btn--ghost {
-            background: transparent;
-            border: 1px solid var(--ink-muted);
-            color: var(--ink-muted);
-        }
-
-        .btn--ghost:hover { background: rgba(0, 0, 0, .05); }
-
-        .status-line {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--ink-muted);
-            min-height: 1.2em;
-            margin: 0.9rem 0 0;
-        }
-
-        .status-line.is-error { color: var(--danger); }
-
-        .answer {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--rule);
-        }
-
-        .answer__text {
-            font-size: 1.02rem;
-            line-height: 1.6;
-            margin: 0 0 1rem;
-        }
-
-        .sources__label {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--ink-muted);
-            margin: 0 0 0.6rem;
-        }
-
-        .source {
-            background: transparent;
-            border-left: 3px solid transparent;
-            border-radius: 6px;
-            padding: 0.6rem 0.85rem;
-            margin-bottom: 0.9rem;
-            opacity: 0;
-            transform: translateY(4px);
-            transition: opacity .5s ease, transform .5s ease, border-color .5s ease, background .5s ease;
-        }
-
-        .source--lit {
-            opacity: 1;
-            transform: translateY(0);
-            border-left-color: var(--lumen);
-            background: rgba(255, 255, 255, .4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
-        .source__excerpt {
-            font-size: 0.88rem;
-            line-height: 1.55;
-            color: var(--ink);
-            margin: 0 0 0.3rem;
-        }
-
-        .source__file {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--ink-muted);
-            margin: 0;
-        }
-
-        .ledger {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem 1rem;
-            justify-content: center;
-            padding: 1.5rem 1rem 2rem;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.03em;
-            color: var(--ink-muted);
-            border-top: 1px solid var(--rule);
-            margin-top: 1rem;
-        }
-
-        .ledger a { text-decoration: none; }
-        .ledger a:hover { text-decoration: underline; }
+        .limitation:hover { padding-left: 0.4rem; }
+        .limitation__index { font-family: var(--font-mono); font-size: 0.7rem; color: var(--danger); min-width: 1.4rem; }
+        .limitation__text { font-size: 0.92rem; line-height: 1.55; }
 
         @media (max-width: 480px) {
-            .card { padding: 1.5rem; }
-            .intro { font-size: 1.15rem; }
-            .btn { align-self: stretch; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .source { transition: none; }
+            .card { padding: 1.25rem; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
+
+    <header class="header">
         <div class="wordmark">Lumen</div>
-        <div class="tagline">Tanya jawab dokumen &middot; Laravel + pgvector</div>
-    </div>
+        <nav class="nav">
+            <a href="{{ url('/app') }}">Try it</a>
+            <a href="#decisions">Decisions</a>
+            <a href="#limitations">Limitations</a>
+        </nav>
+    </header>
 
-    <main class="stage">
-        <div class="card-wrap">
-            <div class="card">
-                <p class="intro">Tanya sesuatu. Lumen membaca dokumenmu, mencari bagian yang benar-benar menjawab, dan menunjukkan bagian itu — bukan cuma jawabannya.</p>
+    <section class="hero">
+        <span class="hero__eyebrow">AI Application Engineer Portfolio &middot; Laravel + pgvector</span>
+        <h1 class="hero__title">Ask a question. Lumen reads your document, finds the passage that actually answers it, and shows you that passage &mdash; not just an answer.</h1>
+        <p class="hero__body">Built end-to-end in Laravel: LLM calls from the backend, retrieval-augmented generation over pgvector, queued retries, a measured evaluation, and a public deploy. No RAG framework &mdash; every step is hand-written so it can be explained on the spot.</p>
+        <div class="hero__meta">
+            <span class="live-dot-row"><span class="live-dot"></span>Public demo &middot; no signup</span>
+        </div>
+    </section>
 
-                <div class="active-doc">
-                    <span class="active-doc__label">Dokumen aktif</span>
-                    <span class="active-doc__name" id="activeDocName">Aurion Dynamics <em>(contoh)</em></span>
-                </div>
-
-                <details class="upload-toggle">
-                    <summary>Upload dokumen lain</summary>
-                    <form id="uploadForm" class="upload-form">
-                        <input type="file" name="file" id="fileInput" accept=".pdf,.txt" required>
-                        <button type="submit" class="btn btn--ghost">Index dokumen</button>
-                        <p class="hint">PDF atau teks, maksimal 2MB.</p>
-                        <p class="upload-status" id="uploadStatus" role="status"></p>
-                    </form>
-                </details>
-
-                <form id="askForm" class="ask-form">
-                    <label for="question" class="sr-only">Pertanyaan</label>
-                    <textarea id="question" name="question" rows="2" placeholder="Mau tanya apa?" required maxlength="2000"></textarea>
-                    <button type="submit" class="btn btn--primary" id="askBtn">Tanya &rarr;</button>
-                </form>
-
-                <p class="status-line" id="statusLine" role="status" aria-live="polite"></p>
-
-                <div class="answer" id="answer" hidden>
-                    <p class="answer__text" id="answerText"></p>
-                    <div id="sourcesBlock">
-                        <p class="sources__label">Dari dokumen:</p>
-                        <div id="sources"></div>
-                    </div>
-                </div>
+    <div class="stage">
+        <div class="card">
+            <div class="ask-placeholder-label">Ask the sample document</div>
+            <div class="ask-placeholder" id="askPlaceholder" aria-hidden="true">
+                <span id="askPlaceholderText"></span><span class="type-cursor">|</span>
+            </div>
+            <div class="ask-row">
+                <a href="{{ url('/app') }}" class="btn btn--invert btn--cta">Ask now &rarr;</a>
             </div>
         </div>
-    </main>
+    </div>
+
+    <section class="section">
+        <h2 class="section__eyebrow">How it works</h2>
+        <div class="pipeline">
+            <div class="pipeline__step"><div class="pipeline__index">01</div><div class="pipeline__label">Upload</div><div class="pipeline__detail">PDF or text, &le;2MB</div></div>
+            <div class="pipeline__step"><div class="pipeline__index">02</div><div class="pipeline__label">Chunk</div><div class="pipeline__detail">500 char / 100 overlap</div></div>
+            <div class="pipeline__step"><div class="pipeline__index">03</div><div class="pipeline__label">Embed</div><div class="pipeline__detail">gemini-embedding-001, 768d</div></div>
+            <div class="pipeline__step"><div class="pipeline__index">04</div><div class="pipeline__label">Store</div><div class="pipeline__detail">pgvector, Postgres</div></div>
+            <div class="pipeline__step"><div class="pipeline__index">05</div><div class="pipeline__label">Retrieve</div><div class="pipeline__detail">top-3, cosine, scoped</div></div>
+            <div class="pipeline__step"><div class="pipeline__index">06</div><div class="pipeline__label">Answer</div><div class="pipeline__detail">queued job + SSE poll</div></div>
+        </div>
+    </section>
+
+    <section id="decisions" class="section">
+        <h2 class="section__title">Technical decisions</h2>
+        <p class="section__lead">Every choice below trades something away on purpose. Ask about any of them &mdash; that's the point of shipping this instead of a tutorial clone.</p>
+        <div class="decisions">
+            <div class="decision"><div class="decision__title">Gemini, not OpenAI/Anthropic</div><div class="decision__body">OpenAI rejects an API key without active billing. Gemini has a free tier that covers a portfolio project.</div></div>
+            <div class="decision"><div class="decision__title">pgvector, not a separate vector DB</div><div class="decision__body">One database for relational and vector data &mdash; fewer moving parts at this scale, with Eloquent-native nearest-neighbor queries.</div></div>
+            <div class="decision"><div class="decision__title">SSE polling, not token streaming</div><div class="decision__body">The job runs async so it can retry safely. SSE watches a DB status row every 0.5s rather than forwarding tokens &mdash; answers arrive whole, not word-by-word.</div></div>
+            <div class="decision"><div class="decision__title">Chunk 500 / overlap 100</div><div class="decision__body">Chosen from an eval run, not a guess &mdash; smaller chunks fixed one retrieval miss but shifted the risk elsewhere (see results below).</div></div>
+            <div class="decision"><div class="decision__title">Retrieval scoped per document</div><div class="decision__body">Without this, a question about one document could be answered with another document&rsquo;s chunks once the corpus grows past one file.</div></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section__title">Measured, not assumed</h2>
+        <p class="section__lead">20 questions, 16 drawn from the seeded document, 4 deliberately out-of-scope to test hallucination. Scored by hand: correct / hallucinated / retrieval-miss.</p>
+        <div class="eval-table">
+            <div class="eval-table__head"></div>
+            <div class="eval-table__head">Chunk 1000/200</div>
+            <div class="eval-table__head">Chunk 500/100</div>
+            <div class="eval-table__cell">Correct</div>
+            <div class="eval-table__cell eval-table__cell--val">19/20</div>
+            <div class="eval-table__cell eval-table__cell--val">19/20</div>
+            <div class="eval-table__cell">Hallucinated</div>
+            <div class="eval-table__cell eval-table__cell--val">0/20</div>
+            <div class="eval-table__cell eval-table__cell--val">0/20</div>
+            <div class="eval-table__cell">Retrieval-miss</div>
+            <div class="eval-table__cell eval-table__cell--val">Q10</div>
+            <div class="eval-table__cell eval-table__cell--val">Q6</div>
+        </div>
+        <p class="eval-note">Smaller chunks sharpened retrieval for some questions but narrowed corpus coverage for the fixed top-3 &mdash; the miss moved to a different question rather than disappearing. Chunk size and top-k are one parameter set, not two independent knobs.</p>
+    </section>
+
+    <section id="limitations" class="section">
+        <h2 class="section__title">Honest limitations</h2>
+        <p class="section__lead">Stated up front, not discovered by the reader.</p>
+        <div class="limitations">
+            <div class="limitation"><span class="limitation__index">01</span><span class="limitation__text">Retrieval can miss: if the true top-3 chunks by embedding similarity aren&rsquo;t the ones that answer the question, Lumen says "I don&rsquo;t know" rather than guessing &mdash; but the answer is incomplete.</span></div>
+            <div class="limitation"><span class="limitation__index">02</span><span class="limitation__text">No real token streaming &mdash; the answer appears whole once the LLM finishes; SSE only reports pending/processing in between.</span></div>
+            <div class="limitation"><span class="limitation__index">03</span><span class="limitation__text">Gemini free tier caps at 20 requests/day per model &mdash; heavy testing in one day can exhaust it.</span></div>
+            <div class="limitation"><span class="limitation__index">04</span><span class="limitation__text">Upload is capped at 2MB and processed synchronously &mdash; larger documents risk a timeout.</span></div>
+            <div class="limitation"><span class="limitation__index">05</span><span class="limitation__text">No authentication. The endpoints are public by design for a demo, not for real multi-tenant production use.</span></div>
+        </div>
+    </section>
 
     <footer class="ledger">
         <span>MODEL gemini-flash-latest</span>
         <span>CHUNK 500 / OVERLAP 100</span>
         <span>TOP-K 3</span>
         <span>EMBED 768D</span>
-        <a href="https://github.com/kearakha/lumen-rag" target="_blank" rel="noopener">kode di GitHub &rarr;</a>
+        <a href="https://github.com/kearakha/lumen-rag" target="_blank" rel="noopener">code on GitHub &rarr;</a>
     </footer>
 
     <script>
         (function () {
-            let activeDocId = {{ (int) (\App\Models\Document::query()->orderBy('id')->value('id') ?? 1) }};
+            const el = document.getElementById('askPlaceholderText');
+            const text = 'What do you want to ask?';
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            const activeDocName = document.getElementById('activeDocName');
-            const uploadForm = document.getElementById('uploadForm');
-            const uploadStatus = document.getElementById('uploadStatus');
-            const askForm = document.getElementById('askForm');
-            const askBtn = document.getElementById('askBtn');
-            const questionInput = document.getElementById('question');
-            const statusLine = document.getElementById('statusLine');
-            const answerBlock = document.getElementById('answer');
-            const answerText = document.getElementById('answerText');
-            const sourcesEl = document.getElementById('sources');
-
-            uploadForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const file = document.getElementById('fileInput').files[0];
-                if (!file) return;
-
-                uploadStatus.textContent = 'Mengindex dokumen…';
-                uploadStatus.classList.remove('is-error');
-
-                const body = new FormData();
-                body.append('file', file);
-
-                try {
-                    const res = await fetch('/api/documents', { method: 'POST', body, headers: { Accept: 'application/json' } });
-                    const data = await res.json();
-
-                    if (!res.ok) {
-                        uploadStatus.textContent = data.message || 'Upload gagal.';
-                        uploadStatus.classList.add('is-error');
-                        return;
-                    }
-
-                    activeDocId = data.document_id;
-                    activeDocName.innerHTML = escapeHtml(data.filename) + ' <em>(baru diupload)</em>';
-                    uploadStatus.textContent = data.chunks + ' bagian ter-index. Siap ditanya.';
-                    uploadStatus.classList.remove('is-error');
-                } catch {
-                    uploadStatus.textContent = 'Lumen sedang tidak bisa dihubungi. Coba lagi sebentar lagi.';
-                    uploadStatus.classList.add('is-error');
-                }
-            });
-
-            askForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const question = questionInput.value.trim();
-                if (!question) return;
-
-                askBtn.disabled = true;
-                answerBlock.hidden = true;
-                sourcesEl.innerHTML = '';
-                statusLine.classList.remove('is-error');
-                statusLine.textContent = 'Mengirim pertanyaan…';
-
-                try {
-                    const res = await fetch('/api/ask', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                        body: JSON.stringify({ question, document_id: activeDocId }),
-                    });
-                    const data = await res.json();
-
-                    if (!res.ok) {
-                        statusLine.textContent = data.message || 'Pertanyaan ditolak.';
-                        statusLine.classList.add('is-error');
-                        askBtn.disabled = false;
-                        return;
-                    }
-
-                    listen(data.ask_id);
-                } catch {
-                    statusLine.textContent = 'Lumen sedang tidak bisa dihubungi. Coba lagi sebentar lagi.';
-                    statusLine.classList.add('is-error');
-                    askBtn.disabled = false;
-                }
-            });
-
-            function listen(askId) {
-                const es = new EventSource('/api/ask/' + askId + '/stream');
-
-                es.addEventListener('status', (e) => {
-                    const payload = JSON.parse(e.data);
-                    statusLine.textContent = payload.status === 'processing'
-                        ? 'Membaca dokumen…'
-                        : 'Menunggu giliran…';
-                });
-
-                es.addEventListener('done', (e) => {
-                    const payload = JSON.parse(e.data);
-                    statusLine.textContent = '';
-                    showAnswer(payload.answer, payload.sources || []);
-                    askBtn.disabled = false;
-                    es.close();
-                });
-
-                es.addEventListener('error', (e) => {
-                    if (e.data) {
-                        const payload = JSON.parse(e.data);
-                        statusLine.textContent = payload.message;
-                        statusLine.classList.add('is-error');
-                        askBtn.disabled = false;
-                        es.close();
-                    }
-                });
+            if (reduceMotion) {
+                el.textContent = text;
+                return;
             }
 
-            function showAnswer(text, sources) {
-                answerText.textContent = text;
-                answerBlock.hidden = false;
-                sourcesEl.innerHTML = '';
-
-                sources.forEach((s, i) => {
-                    const div = document.createElement('div');
-                    div.className = 'source';
-                    const excerptP = document.createElement('p');
-                    excerptP.className = 'source__excerpt';
-                    excerptP.textContent = s.excerpt;
-                    const fileP = document.createElement('p');
-                    fileP.className = 'source__file';
-                    fileP.textContent = s.document;
-                    div.appendChild(excerptP);
-                    div.appendChild(fileP);
-                    sourcesEl.appendChild(div);
-
-                    setTimeout(() => div.classList.add('source--lit'), 120 * (i + 1));
-                });
-            }
-
-            function escapeHtml(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
+            let i = 0;
+            (function type() {
+                el.textContent = text.slice(0, i);
+                i++;
+                if (i <= text.length) setTimeout(type, 45);
+            })();
         })();
     </script>
 </body>
