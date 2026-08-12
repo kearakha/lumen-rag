@@ -75,7 +75,7 @@ Detail lengkap tiap soal: `.docs/eval/results-baseline.md` dan `.docs/eval/resul
 - **Kuota Gemini free tier: 20 request/hari** per model — bisa kehabisan kalau dipakai testing berat dalam satu hari.
 - **Upload maksimum 2MB**, diproses sinkron — dokumen besar bisa gagal karena timeout.
 - **Tidak ada autentikasi** — endpoint publik terbuka, cocok untuk demo, bukan multi-tenant produksi sungguhan.
-- **Belum ada UI web** — semua interaksi lewat API (`curl`/Postman).
+- **UI web ada** di `/app` (upload + tanya + rail sumber dengan sitasi `[n]`) — belum diuji lintas-browser/device, cuma dipakai lewat satu browser saat development.
 
 ## Stack
 
