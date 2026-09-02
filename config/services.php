@@ -37,7 +37,7 @@ return [
 
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
-        'chat_model' => env('GEMINI_CHAT_MODEL', 'gemini-flash-latest'),
+        'chat_model' => env('GEMINI_CHAT_MODEL', 'gemini-3.6-flash'),
         'via_sanmon' => env('GEMINI_VIA_SANMON', false),
     ],
 
