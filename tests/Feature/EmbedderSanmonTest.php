@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class EmbedderSanmonTest extends TestCase
 {
-    public function test_via_sanmon_hits_gateway_and_orders_by_index(): void
+    public function test_via_sanmon_hits_gateway_and_maps_data_in_order(): void
     {
         config([
             'services.gemini.via_sanmon' => true,
@@ -16,12 +16,12 @@ class EmbedderSanmonTest extends TestCase
             'services.sanmon.key' => 'sk-sanmon-abc',
         ]);
 
-        // Sengaja acak urutannya — hasil harus balik urut index.
+        // Layer OpenAI-compat Gemini balikin data[] urut input, tanpa `index`.
         Http::fake([
             'sanmon.test:8777/v1/embeddings' => Http::response([
                 'data' => [
-                    ['index' => 1, 'embedding' => [0.4, 0.5]],
-                    ['index' => 0, 'embedding' => [0.1, 0.2]],
+                    ['embedding' => [0.1, 0.2]],
+                    ['embedding' => [0.4, 0.5]],
                 ],
             ]),
         ]);

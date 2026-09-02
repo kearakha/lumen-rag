@@ -46,7 +46,8 @@ class Embedder
 
     /**
      * Jalur gateway Sanmon: format OpenAI embeddings, auth virtual key.
-     * Sanmon meneruskan apa adanya ke endpoint OpenAI-compat Gemini.
+     * Sanmon meneruskan apa adanya ke endpoint OpenAI-compat Gemini, yang
+     * mengembalikan data[] urut input (tanpa field `index` a la OpenAI asli).
      *
      * @param  array<int, string>  $texts
      * @return array<int, array<int, float>>
@@ -63,10 +64,10 @@ class Embedder
 
         $this->guard($response);
 
-        $data = $response->json('data');
-        usort($data, fn (array $a, array $b) => $a['index'] <=> $b['index']);
-
-        return array_map(fn (array $row) => $row['embedding'], $data);
+        return array_map(
+            fn (array $row) => $row['embedding'],
+            $response->json('data')
+        );
     }
 
     /**
