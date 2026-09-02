@@ -38,6 +38,12 @@ return [
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
         'chat_model' => env('GEMINI_CHAT_MODEL', 'gemini-flash-latest'),
+        'via_sanmon' => env('GEMINI_VIA_SANMON', false),
+    ],
+
+    'sanmon' => [
+        'base_url' => env('SANMON_BASE_URL', 'http://127.0.0.1:8777'),
+        'key' => env('SANMON_KEY'),
     ],
 
 ];
